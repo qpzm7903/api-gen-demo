@@ -6,7 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="api-gen" />
+        <module name="permission-service" />
+        <module name="user-service" />
+        <module name="menu-service" />
+        <module name="common" />
       </profile>
     </annotationProcessing>
   </component>

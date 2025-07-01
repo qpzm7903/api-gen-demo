@@ -1,0 +1,83 @@
+# OpenAPI Generator Demo Project - Cursor Rules
+
+## 🎯 CORE PRINCIPLES
+- ALL development work MUST strictly follow the specifications and task list defined in README.md
+- README.md is the ONLY authoritative guidance document for this project
+- Every task completion MUST ensure the entire project compiles successfully
+
+## 📋 TASK EXECUTION RULES
+
+### Phase-based Development
+- MUST follow the exact sequence: Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5
+- Cannot start next phase until all tasks in current phase are completed
+- Each completed task must be marked as [x] in README.md
+
+### Compilation Verification (MANDATORY)
+- After completing ANY task, MUST run `mvn clean compile`
+- Task is NOT considered complete until compilation passes
+- If compilation fails, must fix immediately or rollback changes
+- Never mark a task as complete [x] without successful compilation
+
+## 🏗️ TECHNICAL STANDARDS
+
+### Package Naming
+- STRICT format: `com.qpzm7903.{service-name}.{api/model}`
+- No exceptions or variations allowed
+
+### Directory Structure
+- MUST follow the structure defined in README.md technical specifications
+- API specs MUST be in `api-specs/` directory
+- Each service MUST have its own module directory
+
+### Code Generation Rules
+- common module: Generate ONLY model classes, NO API interfaces
+- service modules: Generate complete API interfaces AND model classes
+- All generated code MUST be in `src/main/java/` directory
+
+## 🔄 WORKFLOW REQUIREMENTS
+
+### Before Starting Any Task
+- Check README.md for current progress and task dependencies
+- Verify previous tasks are completed and marked as [x]
+- Ensure project compiles successfully before making changes
+
+### During Task Execution
+- If problems arise, update README.md first before proceeding
+- Stay within the defined technical specifications
+- Do not deviate from established patterns
+
+### After Task Completion
+1. Run `mvn clean compile` and verify success
+2. Update task status to [x] in README.md
+3. Document any issues encountered or lessons learned
+
+## 🚫 PROHIBITED ACTIONS
+- Skipping phases or changing task order
+- Deviating from defined technical specifications
+- Making major changes without updating README.md
+- Creating directories or files outside the defined structure
+- Submitting code that fails compilation
+- Marking tasks complete without compilation verification
+
+## 📝 COMMUNICATION RULES
+- Always reference README.md sections when discussing project content
+- Any specification changes MUST be documented in README.md
+- Progress reports must check against the task list in README.md
+
+## 🛠️ MAVEN PROJECT STRUCTURE
+```
+api-gen/
+├── api-specs/                 # API specification files
+├── common/                   # Common models only
+├── user-service/            # User management service
+├── menu-service/            # Menu management service
+└── permission-service/      # Permission management service
+```
+
+## ⚡ QUICK COMMANDS
+- Compile check: `mvn clean compile`
+- Current phase: Check README.md task list
+- Mark complete: Update [ ] to [x] in README.md
+
+---
+**REMEMBER: This project is for learning OpenAPI Generator. Every action must contribute to that learning goal while maintaining code quality and project integrity.** 
