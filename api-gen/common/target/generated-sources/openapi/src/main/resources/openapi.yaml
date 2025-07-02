@@ -1,0 +1,288 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: dev@qpzm7903.com
+    name: API Gen Demo Team
+  description: 公共数据结构定义，为所有服务提供通用的数据模型
+  title: Common Types API
+  version: 1.0.0
+servers:
+- description: 本地开发服务器
+  url: http://localhost:8080
+paths: {}
+components:
+  schemas:
+    ID:
+      description: 通用ID类型，支持字母、数字、下划线、连字符
+      example: user_123
+      maxLength: 64
+      minLength: 1
+      pattern: "^[a-zA-Z0-9_-]+$"
+      type: string
+    NumericID:
+      description: 数字ID类型，用于自增主键
+      example: 123
+      format: int64
+      minimum: 1
+      type: integer
+    Timestamp:
+      description: ISO 8601 格式的时间戳
+      example: 2024-01-01T12:00:00Z
+      format: date-time
+      type: string
+    PageSize:
+      default: 20
+      description: 分页大小，默认20，最大100
+      example: 20
+      maximum: 100
+      minimum: 1
+      type: integer
+    PageNumber:
+      default: 1
+      description: 页码，从1开始
+      example: 1
+      minimum: 1
+      type: integer
+    ApiResponse:
+      properties:
+        success:
+          description: 请求是否成功
+          example: true
+          type: boolean
+        code:
+          description: 响应状态码
+          example: SUCCESS
+          type: string
+        message:
+          description: 响应消息
+          example: 操作成功
+          type: string
+        data:
+          description: 响应数据，类型根据具体接口而定
+          example: null
+        timestamp:
+          description: ISO 8601 格式的时间戳
+          example: 2024-01-01T12:00:00Z
+          format: date-time
+          type: string
+        traceId:
+          description: 请求追踪ID
+          example: trace_abc123
+          type: string
+      required:
+      - code
+      - message
+      - success
+      - timestamp
+      type: object
+    PageData:
+      properties:
+        content:
+          description: 分页数据内容
+          items: {}
+          type: array
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+      required:
+      - content
+      - pagination
+      type: object
+    PaginationInfo:
+      properties:
+        pageNumber:
+          default: 1
+          description: 页码，从1开始
+          example: 1
+          minimum: 1
+          type: integer
+        pageSize:
+          default: 20
+          description: 分页大小，默认20，最大100
+          example: 20
+          maximum: 100
+          minimum: 1
+          type: integer
+        totalElements:
+          description: 总记录数
+          example: 100
+          minimum: 0
+          type: integer
+        totalPages:
+          description: 总页数
+          example: 5
+          minimum: 0
+          type: integer
+        hasNext:
+          description: 是否有下一页
+          example: true
+          type: boolean
+        hasPrevious:
+          description: 是否有上一页
+          example: false
+          type: boolean
+      required:
+      - hasNext
+      - hasPrevious
+      - pageNumber
+      - pageSize
+      - totalElements
+      - totalPages
+      type: object
+    ErrorResponse:
+      allOf:
+      - $ref: '#/components/schemas/ApiResponse'
+      - properties:
+          success:
+            description: 错误响应固定为false
+            type: boolean
+          data:
+            $ref: '#/components/schemas/ErrorDetail'
+        required:
+        - code
+        - message
+        - success
+        type: object
+    ErrorDetail:
+      properties:
+        errorCode:
+          description: 详细错误码
+          example: VALIDATION_FAILED
+          type: string
+        errorFields:
+          description: 字段验证错误列表
+          items:
+            $ref: '#/components/schemas/FieldError'
+          type: array
+        debugInfo:
+          description: 调试信息（仅开发环境）
+          example: Validation failed for field 'email'
+          type: string
+      type: object
+    FieldError:
+      properties:
+        field:
+          description: 错误字段名
+          example: email
+          type: string
+        message:
+          description: 错误消息
+          example: 邮箱格式不正确
+          type: string
+        rejectedValue:
+          description: 被拒绝的值
+          example: invalid-email
+      required:
+      - field
+      - message
+      type: object
+    Status:
+      description: 通用状态枚举
+      enum:
+      - ACTIVE
+      - INACTIVE
+      - DELETED
+      example: ACTIVE
+      type: string
+    CreateInfo:
+      properties:
+        createdAt:
+          description: ISO 8601 格式的时间戳
+          example: 2024-01-01T12:00:00Z
+          format: date-time
+          type: string
+        createdBy:
+          description: 通用ID类型，支持字母、数字、下划线、连字符
+          example: user_123
+          maxLength: 64
+          minLength: 1
+          pattern: "^[a-zA-Z0-9_-]+$"
+          type: string
+      required:
+      - createdAt
+      - createdBy
+      type: object
+    UpdateInfo:
+      properties:
+        updatedAt:
+          description: ISO 8601 格式的时间戳
+          example: 2024-01-01T12:00:00Z
+          format: date-time
+          type: string
+        updatedBy:
+          description: 通用ID类型，支持字母、数字、下划线、连字符
+          example: user_123
+          maxLength: 64
+          minLength: 1
+          pattern: "^[a-zA-Z0-9_-]+$"
+          type: string
+      required:
+      - updatedAt
+      - updatedBy
+      type: object
+    AuditInfo:
+      allOf:
+      - $ref: '#/components/schemas/CreateInfo'
+      - $ref: '#/components/schemas/UpdateInfo'
+    SoftDeleteInfo:
+      properties:
+        deletedAt:
+          description: ISO 8601 格式的时间戳
+          example: 2024-01-01T12:00:00Z
+          format: date-time
+          type: string
+        deletedBy:
+          description: 通用ID类型，支持字母、数字、下划线、连字符
+          example: user_123
+          maxLength: 64
+          minLength: 1
+          pattern: "^[a-zA-Z0-9_-]+$"
+          type: string
+        isDeleted:
+          default: false
+          description: 是否已删除
+          type: boolean
+      type: object
+    PageRequest:
+      properties:
+        pageNumber:
+          default: 1
+          description: 页码，从1开始
+          example: 1
+          minimum: 1
+          type: integer
+        pageSize:
+          default: 20
+          description: 分页大小，默认20，最大100
+          example: 20
+          maximum: 100
+          minimum: 1
+          type: integer
+        sortBy:
+          description: 排序字段
+          example: createdAt
+          type: string
+        sortDirection:
+          default: DESC
+          description: 排序方向
+          enum:
+          - ASC
+          - DESC
+          example: DESC
+          type: string
+      type: object
+    SearchRequest:
+      allOf:
+      - $ref: '#/components/schemas/PageRequest'
+      - properties:
+          keyword:
+            description: 搜索关键词
+            example: 关键词
+            maxLength: 200
+            type: string
+          status:
+            $ref: '#/components/schemas/Status'
+          startDate:
+            $ref: '#/components/schemas/Timestamp'
+          endDate:
+            $ref: '#/components/schemas/Timestamp'
+        type: object

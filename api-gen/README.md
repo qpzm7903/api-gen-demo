@@ -37,10 +37,14 @@ PS:阶段2只要求设计API，编写api的yaml文件，并且支持生成
 - [x] 配置 permission-service 模块的 OpenAPI Generator 插件
 
 ### 第四阶段：API YAML编写与生成验证
-- [ ] 设计公共数据结构 YAML (`common-types.yaml`)
-  - [ ] 定义通用响应结构 (ApiResponse, PageResult 等)
-  - [ ] 定义通用错误码和异常结构
-  - [ ] 定义基础数据类型 (ID, 时间戳等)
+- [x] 设计公共数据结构 YAML (`common-types.yaml`) ✅ **BUILD SUCCESS**
+  - [x] 定义通用响应结构 (ModelApiResponse, ErrorResponse, ErrorDetail, FieldError)
+  - [x] 定义通用错误码和异常结构 (ErrorResponse, ErrorDetail)
+  - [x] 定义基础数据类型 (ID, NumericID, Timestamp, Status)
+  - [x] 定义分页结构 (PageData, PaginationInfo, PageRequest)
+  - [x] 定义审计字段 (AuditInfo, CreateInfo, UpdateInfo, SoftDeleteInfo) 
+  - [x] 定义搜索过滤 (SearchRequest)
+  - [x] **代码生成验证通过 - 13个模型类成功生成**
 - [ ] 设计用户服务 API (`user-service-api.yaml`)
   - [ ] 用户注册、登录、登出接口
   - [ ] 用户信息查询、更新接口

@@ -1,0 +1,292 @@
+openapi: 3.0.3
+info:
+  title: Common Types API
+  description: 公共数据结构定义，为所有服务提供通用的数据模型
+  version: 1.0.0
+  contact:
+    name: API Gen Demo Team
+    email: dev@qpzm7903.com
+
+servers:
+  - url: http://localhost:8080
+    description: 本地开发服务器
+
+# 公共数据结构定义
+components:
+  schemas:
+    # ========== 基础数据类型 ==========
+    
+    # 通用ID类型
+    ID:
+      type: string
+      pattern: '^[a-zA-Z0-9_-]+$'
+      minLength: 1
+      maxLength: 64
+      description: 通用ID类型，支持字母、数字、下划线、连字符
+      example: "user_123"
+    
+    # 数字ID类型
+    NumericID:
+      type: integer
+      format: int64
+      minimum: 1
+      description: 数字ID类型，用于自增主键
+      example: 123
+    
+    # 时间戳类型
+    Timestamp:
+      type: string
+      format: date-time
+      description: ISO 8601 格式的时间戳
+      example: "2024-01-01T12:00:00Z"
+    
+    # 分页大小
+    PageSize:
+      type: integer
+      minimum: 1
+      maximum: 100
+      default: 20
+      description: 分页大小，默认20，最大100
+      example: 20
+    
+    # 页码
+    PageNumber:
+      type: integer
+      minimum: 1
+      default: 1
+      description: 页码，从1开始
+      example: 1
+    
+    # ========== 通用响应结构 ==========
+    
+    # 统一API响应格式
+    ApiResponse:
+      type: object
+      required:
+        - success
+        - code
+        - message
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+          example: true
+        code:
+          type: string
+          description: 响应状态码
+          example: "SUCCESS"
+        message:
+          type: string
+          description: 响应消息
+          example: "操作成功"
+        data:
+          description: 响应数据，类型根据具体接口而定
+          example: null
+        timestamp:
+          $ref: '#/components/schemas/Timestamp'
+        traceId:
+          type: string
+          description: 请求追踪ID
+          example: "trace_abc123"
+    
+    # 分页响应数据
+    PageData:
+      type: object
+      required:
+        - content
+        - pagination
+      properties:
+        content:
+          type: array
+          items: {}
+          description: 分页数据内容
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+    
+    # 分页信息
+    PaginationInfo:
+      type: object
+      required:
+        - pageNumber
+        - pageSize
+        - totalElements
+        - totalPages
+        - hasNext
+        - hasPrevious
+      properties:
+        pageNumber:
+          $ref: '#/components/schemas/PageNumber'
+        pageSize:
+          $ref: '#/components/schemas/PageSize'
+        totalElements:
+          type: integer
+          minimum: 0
+          description: 总记录数
+          example: 100
+        totalPages:
+          type: integer
+          minimum: 0
+          description: 总页数
+          example: 5
+        hasNext:
+          type: boolean
+          description: 是否有下一页
+          example: true
+        hasPrevious:
+          type: boolean
+          description: 是否有上一页
+          example: false
+    
+    # ========== 错误处理 ==========
+    
+    # 错误响应
+    ErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          required:
+            - success
+            - code
+            - message
+          properties:
+            success:
+              type: boolean
+              enum: [false]
+              description: 错误响应固定为false
+            data:
+              $ref: '#/components/schemas/ErrorDetail'
+    
+    # 错误详情
+    ErrorDetail:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: 详细错误码
+          example: "VALIDATION_FAILED"
+        errorFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldError'
+          description: 字段验证错误列表
+        debugInfo:
+          type: string
+          description: 调试信息（仅开发环境）
+          example: "Validation failed for field 'email'"
+    
+    # 字段错误
+    FieldError:
+      type: object
+      required:
+        - field
+        - message
+      properties:
+        field:
+          type: string
+          description: 错误字段名
+          example: "email"
+        message:
+          type: string
+          description: 错误消息
+          example: "邮箱格式不正确"
+        rejectedValue:
+          description: 被拒绝的值
+          example: "invalid-email"
+    
+    # ========== 常用业务数据类型 ==========
+    
+    # 状态枚举
+    Status:
+      type: string
+      enum: 
+        - ACTIVE
+        - INACTIVE
+        - DELETED
+      description: 通用状态枚举
+      example: "ACTIVE"
+    
+    # 创建信息
+    CreateInfo:
+      type: object
+      required:
+        - createdAt
+        - createdBy
+      properties:
+        createdAt:
+          $ref: '#/components/schemas/Timestamp'
+        createdBy:
+          $ref: '#/components/schemas/ID'
+    
+    # 更新信息
+    UpdateInfo:
+      type: object
+      required:
+        - updatedAt
+        - updatedBy
+      properties:
+        updatedAt:
+          $ref: '#/components/schemas/Timestamp'
+        updatedBy:
+          $ref: '#/components/schemas/ID'
+    
+    # 审计信息（包含创建和更新）
+    AuditInfo:
+      allOf:
+        - $ref: '#/components/schemas/CreateInfo'
+        - $ref: '#/components/schemas/UpdateInfo'
+    
+    # 软删除信息
+    SoftDeleteInfo:
+      type: object
+      properties:
+        deletedAt:
+          $ref: '#/components/schemas/Timestamp'
+        deletedBy:
+          $ref: '#/components/schemas/ID'
+        isDeleted:
+          type: boolean
+          default: false
+          description: 是否已删除
+    
+    # ========== 请求查询参数 ==========
+    
+    # 分页查询参数
+    PageRequest:
+      type: object
+      properties:
+        pageNumber:
+          $ref: '#/components/schemas/PageNumber'
+        pageSize:
+          $ref: '#/components/schemas/PageSize'
+        sortBy:
+          type: string
+          description: 排序字段
+          example: "createdAt"
+        sortDirection:
+          type: string
+          enum: [ASC, DESC]
+          default: DESC
+          description: 排序方向
+          example: "DESC"
+    
+    # 搜索查询参数
+    SearchRequest:
+      allOf:
+        - $ref: '#/components/schemas/PageRequest'
+        - type: object
+          properties:
+            keyword:
+              type: string
+              maxLength: 200
+              description: 搜索关键词
+              example: "关键词"
+            status:
+              $ref: '#/components/schemas/Status'
+            startDate:
+              $ref: '#/components/schemas/Timestamp'
+            endDate:
+              $ref: '#/components/schemas/Timestamp'
+
+# 添加空的paths部分以满足OpenAPI规范要求
+paths: {} 
