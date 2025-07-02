@@ -111,6 +111,33 @@
                                         <useSwaggerUI>false</useSwaggerUI>
                                         <reactive>false</reactive>
                                     </configOptions>
+                                    
+                                    <!-- 导入映射：引用common模块的公共类，避免重复生成 -->
+                                    <importMappings>
+                                        <importMapping>ErrorDetail=com.qpzm7903.common.model.ErrorDetail</importMapping>
+                                        <importMapping>ErrorResponse=com.qpzm7903.common.model.ErrorResponse</importMapping>
+                                        <importMapping>FieldError=com.qpzm7903.common.model.FieldError</importMapping>
+                                        <importMapping>ModelApiResponse=com.qpzm7903.common.model.ModelApiResponse</importMapping>
+                                        <importMapping>PageData=com.qpzm7903.common.model.PageData</importMapping>
+                                        <importMapping>PaginationInfo=com.qpzm7903.common.model.PaginationInfo</importMapping>
+                                        <importMapping>SearchRequest=com.qpzm7903.common.model.SearchRequest</importMapping>
+                                        <importMapping>AuditInfo=com.qpzm7903.common.model.AuditInfo</importMapping>
+                                        <importMapping>CreateInfo=com.qpzm7903.common.model.CreateInfo</importMapping>
+                                        <importMapping>UpdateInfo=com.qpzm7903.common.model.UpdateInfo</importMapping>
+                                        <importMapping>SoftDeleteInfo=com.qpzm7903.common.model.SoftDeleteInfo</importMapping>
+                                        <importMapping>Status=com.qpzm7903.common.model.Status</importMapping>
+                                        <importMapping>PageRequest=com.qpzm7903.common.model.PageRequest</importMapping>
+                                    </importMappings>
+                                    
+                                    <!-- 模型名称映射：指定使用common模块的类，跳过生成 -->
+                                    <modelNameMappings>
+                                        <modelNameMapping>ErrorDetail=com.qpzm7903.common.model.ErrorDetail</modelNameMapping>
+                                        <modelNameMapping>ErrorResponse=com.qpzm7903.common.model.ErrorResponse</modelNameMapping>
+                                        <modelNameMapping>FieldError=com.qpzm7903.common.model.FieldError</modelNameMapping>
+                                        <modelNameMapping>ModelApiResponse=com.qpzm7903.common.model.ModelApiResponse</modelNameMapping>
+                                        <modelNameMapping>PageData=com.qpzm7903.common.model.PageData</modelNameMapping>
+                                        <modelNameMapping>PaginationInfo=com.qpzm7903.common.model.PaginationInfo</modelNameMapping>
+                                    </modelNameMappings>
                                 </configuration>
                             </execution>
                         </executions>
