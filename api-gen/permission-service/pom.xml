@@ -13,6 +13,12 @@
     <artifactId>permission-service</artifactId>
     <description>Permission management service with OpenAPI generated interfaces</description>
 
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <!-- 内部模块依赖 -->
         <dependency>
@@ -48,5 +54,97 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
     </dependencies>
+
+    <!-- Profiles 配置 -->
+    <profiles>
+        <!-- 代码生成 Profile - 仅在有 YAML 文件时激活 -->
+        <profile>
+            <id>generate-code</id>
+            <activation>
+                <file>
+                    <exists>../api-specs/permission-service-api.yaml</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- OpenAPI Generator Maven 插件 -->
+                    <plugin>
+                        <groupId>org.openapitools</groupId>
+                        <artifactId>openapi-generator-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- API 规范文件路径 -->
+                                    <inputSpec>${project.parent.basedir}/api-specs/permission-service-api.yaml</inputSpec>
+                                    <!-- 生成器类型：Spring Boot -->
+                                    <generatorName>spring</generatorName>
+                                    <!-- 输出目录 -->
+                                    <output>${project.build.directory}/generated-sources/openapi</output>
+                                    <!-- 包名配置 -->
+                                    <apiPackage>com.qpzm7903.permission.api</apiPackage>
+                                    <modelPackage>com.qpzm7903.permission.model</modelPackage>
+                                    <invokerPackage>com.qpzm7903.permission</invokerPackage>
+                                    <!-- 生成配置 -->
+                                    <generateApis>true</generateApis>
+                                    <generateModels>true</generateModels>
+                                    <generateSupportingFiles>false</generateSupportingFiles>
+                                    <generateModelTests>false</generateModelTests>
+                                    <generateApiTests>false</generateApiTests>
+                                    <generateModelDocumentation>false</generateModelDocumentation>
+                                    <generateApiDocumentation>false</generateApiDocumentation>
+                                    
+                                    <!-- 配置选项 -->
+                                    <configOptions>
+                                        <!-- Spring Boot 相关配置 -->
+                                        <dateLibrary>java8</dateLibrary>
+                                        <java8>true</java8>
+                                        <performBeanValidation>true</performBeanValidation>
+                                        <useBeanValidation>true</useBeanValidation>
+                                        <useJakartaEe>true</useJakartaEe>
+                                        <serializableModel>true</serializableModel>
+                                        <interfaceOnly>true</interfaceOnly>
+                                        <skipDefaultInterface>true</skipDefaultInterface>
+                                        <useTags>true</useTags>
+                                        <useSpringBoot3>true</useSpringBoot3>
+                                        <useSwaggerUI>false</useSwaggerUI>
+                                        <reactive>false</reactive>
+                                    </configOptions>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <!-- 默认构建配置 -->
+    <build>
+        <plugins>
+            <!-- 确保将生成的源码目录添加到构建路径 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/openapi/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

@@ -1,0 +1,115 @@
+@startuml 系统整体架构图
+!theme aws-orange
+title OpenAPI Generator Demo - 系统整体架构
+
+!define RECTANGLE class
+
+package "开发工具链" {
+    RECTANGLE "OpenAPI 3.0\nYAML 规范" as yaml {
+        + common-types.yaml
+        + user-service-api.yaml
+        + menu-service-api.yaml
+        + permission-service-api.yaml
+    }
+    
+    RECTANGLE "OpenAPI Generator\nMaven Plugin" as generator {
+        + 代码生成引擎
+        + Spring Boot 模板
+        + 模型生成器
+    }
+}
+
+package "Maven 多模块项目" {
+    
+    RECTANGLE "Common 模块" as common #lightblue {
+        + 通用数据模型
+        + 响应结构
+        + 错误码定义
+        + 基础类型
+        --
+        只生成 Model 类
+    }
+    
+    RECTANGLE "User Service" as userService #lightgreen {
+        + 用户 API 接口
+        + 用户控制器
+        + 用户业务逻辑
+        --
+        端口: 8081
+    }
+    
+    RECTANGLE "Menu Service" as menuService #lightyellow {
+        + 菜单 API 接口
+        + 菜单控制器
+        + 菜单业务逻辑
+        --
+        端口: 8082
+    }
+    
+    RECTANGLE "Permission Service" as permService #lightcoral {
+        + 权限 API 接口
+        + 权限控制器
+        + 权限业务逻辑
+        --
+        端口: 8083
+    }
+}
+
+package "运行时环境" {
+    RECTANGLE "Spring Boot\n应用容器" as container {
+        + Web 服务器
+        + 依赖注入
+        + 自动配置
+    }
+    
+    RECTANGLE "Swagger UI" as swagger {
+        + API 文档界面
+        + 接口测试工具
+        + 在线调试
+    }
+}
+
+' 代码生成流程
+yaml -> generator : 读取规范
+generator -> common : 生成公共模型
+generator -> userService : 生成用户API
+generator -> menuService : 生成菜单API
+generator -> permService : 生成权限API
+
+' 依赖关系
+userService ..> common : 依赖
+menuService ..> common : 依赖
+permService ..> common : 依赖
+
+' 运行时关系
+userService -> container : 部署
+menuService -> container : 部署
+permService -> container : 部署
+container -> swagger : 提供文档
+
+' 服务间调用
+userService <--> permService : HTTP 调用
+menuService <--> permService : HTTP 调用
+menuService <--> userService : HTTP 调用
+
+note top of yaml
+  API 规范定义
+  作为代码生成的输入
+end note
+
+note right of generator
+  Maven 构建时
+  自动生成代码
+end note
+
+note bottom of common
+  被所有服务依赖
+  提供统一数据模型
+end note
+
+note bottom of container
+  微服务运行环境
+  支持独立部署
+end note
+
+@enduml 

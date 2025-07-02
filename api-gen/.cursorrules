@@ -8,7 +8,7 @@
 ## 📋 TASK EXECUTION RULES
 
 ### Phase-based Development
-- MUST follow the exact sequence: Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5
+- MUST follow the exact sequence: Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6
 - Cannot start next phase until all tasks in current phase are completed
 - Each completed task must be marked as [x] in README.md
 
@@ -17,6 +17,17 @@
 - Task is NOT considered complete until compilation passes
 - If compilation fails, must fix immediately or rollback changes
 - Never mark a task as complete [x] without successful compilation
+
+### 🔥 Incremental Verification (MANDATORY)
+- **CRITICAL RULE**: Every time you add a module YAML file, MUST immediately verify code generation
+- **Phase 4 Specific**: When writing API YAML files:
+  1. Write ONE module's YAML file (e.g., common-types.yaml)
+  2. IMMEDIATELY configure and run OpenAPI Generator for that module
+  3. Verify generated code compiles successfully
+  4. Only then proceed to next module's YAML
+- **No Batch Processing**: NEVER write all YAML files first then generate code later
+- **Fast Feedback Loop**: Catch configuration issues immediately, not at the end
+- This follows continuous integration best practices
 
 ## 🏗️ TECHNICAL STANDARDS
 
@@ -45,6 +56,8 @@
 - If problems arise, update README.md first before proceeding
 - Stay within the defined technical specifications
 - Do not deviate from established patterns
+- **For Phase 4 (YAML Writing)**: Apply incremental verification for each module
+- **One YAML → One Verification → One Module Complete**: Never break this cycle
 
 ### After Task Completion
 1. Run `mvn clean compile` and verify success
@@ -58,6 +71,9 @@
 - Creating directories or files outside the defined structure
 - Submitting code that fails compilation
 - Marking tasks complete without compilation verification
+- **🚫 BATCH YAML WRITING**: Writing multiple YAML files before verifying code generation
+- **🚫 DELAYED VERIFICATION**: Adding YAML files without immediate code generation testing
+- **🚫 SKIPPING INCREMENTAL CHECKS**: Proceeding to next module without verifying current module works
 
 ## 📝 COMMUNICATION RULES
 - Always reference README.md sections when discussing project content
@@ -76,8 +92,10 @@ api-gen/
 
 ## ⚡ QUICK COMMANDS
 - Compile check: `mvn clean compile`
+- Code generation (per module): `mvn clean generate-sources compile`
 - Current phase: Check README.md task list
 - Mark complete: Update [ ] to [x] in README.md
+- **Incremental workflow**: YAML → Generate → Compile → Verify → Next Module
 
 ---
 **REMEMBER: This project is for learning OpenAPI Generator. Every action must contribute to that learning goal while maintaining code quality and project integrity.** 

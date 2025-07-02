@@ -1,0 +1,64 @@
+@startuml 服务交互流程图
+!theme aws-orange
+title OpenAPI Generator Demo - 服务交互流程
+
+actor "前端用户" as client
+participant "User Service" as user
+participant "Menu Service" as menu
+participant "Permission Service" as permission
+database "Common Models" as common
+
+== 用户登录流程 ==
+client -> user : 1. 登录请求
+user -> permission : 2. 验证用户权限
+permission -> common : 3. 使用通用响应模型
+permission --> user : 4. 返回权限信息
+user -> common : 5. 构造登录响应
+user --> client : 6. 返回登录结果
+
+== 获取用户菜单流程 ==
+client -> menu : 1. 请求用户菜单
+menu -> user : 2. 获取用户信息
+user --> menu : 3. 返回用户信息
+menu -> permission : 4. 查询用户权限
+permission --> menu : 5. 返回权限列表
+menu -> common : 6. 使用分页结果模型
+menu --> client : 7. 返回授权菜单
+
+== 权限验证流程 ==
+client -> user : 1. 操作请求
+user -> permission : 2. 权限检查
+permission -> common : 3. 使用错误码定义
+permission --> user : 4. 权限验证结果
+user --> client : 5. 操作响应
+
+note over common
+  提供通用数据结构：
+  - ApiResponse
+  - PageResult  
+  - ErrorCode
+  - 基础ID类型
+end note
+
+note over user
+  负责：
+  - 用户认证
+  - 用户信息管理
+  - 用户状态控制
+end note
+
+note over menu
+  负责：
+  - 菜单管理
+  - 菜单树构建
+  - 菜单权限过滤
+end note
+
+note over permission
+  负责：
+  - 权限验证
+  - 角色管理
+  - 授权判断
+end note
+
+@enduml 

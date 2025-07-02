@@ -21,7 +21,22 @@
 - [x] 为每个子模块配置基础 pom.xml
 
 ### 第二阶段：API 规范设计
-- [ ] 创建统一的 API 规范目录 `api-specs/`
+- [x] 创建统一的 API 规范目录 `api-specs/`
+- [x] 完成架构设计，设计四个模块之间的依赖关系，每个模块负责什么东西。使用Planuml呈现。归档在arch目录里
+
+PS:阶段2只要求设计API，编写api的yaml文件，并且支持生成
+
+### 第三阶段：Maven 插件配置
+- [x] 配置 common 模块的 OpenAPI Generator 插件
+  - [x] 只生成 model 类（DTO/Entity）
+  - [x] 配置生成的包名和类名规范
+- [x] 配置 user-service 模块的 OpenAPI Generator 插件
+  - [x] 生成 API 接口和 model 类
+  - [x] 配置 Spring Boot 相关注解
+- [x] 配置 menu-service 模块的 OpenAPI Generator 插件
+- [x] 配置 permission-service 模块的 OpenAPI Generator 插件
+
+### 第四阶段：API YAML编写与生成验证
 - [ ] 设计公共数据结构 YAML (`common-types.yaml`)
   - [ ] 定义通用响应结构 (ApiResponse, PageResult 等)
   - [ ] 定义通用错误码和异常结构
@@ -39,24 +54,17 @@
   - [ ] 角色管理接口
   - [ ] 用户角色分配接口
 
-### 第三阶段：Maven 插件配置
-- [ ] 配置 common 模块的 OpenAPI Generator 插件
-  - [ ] 只生成 model 类（DTO/Entity）
-  - [ ] 配置生成的包名和类名规范
-- [ ] 配置 user-service 模块的 OpenAPI Generator 插件
-  - [ ] 生成 API 接口和 model 类
-  - [ ] 配置 Spring Boot 相关注解
-- [ ] 配置 menu-service 模块的 OpenAPI Generator 插件
-- [ ] 配置 permission-service 模块的 OpenAPI Generator 插件
+PS要求：每个任务完成都必须保证编译通过，每添加一个模块的yaml，就应该完成对应代码生成的验证。
 
-### 第四阶段：代码生成和集成
+
+### 第五阶段：代码生成和集成
 - [ ] 执行 common 模块代码生成
 - [ ] 配置各服务模块对 common 模块的依赖
 - [ ] 执行各服务模块代码生成
 - [ ] 验证生成的代码编译通过
 - [ ] 添加必要的业务实现代码
 
-### 第五阶段：测试和文档
+### 第六阶段：测试和文档
 - [ ] 为每个服务添加基础的 Controller 实现
 - [ ] 配置 Swagger UI 界面
 - [ ] 编写简单的集成测试
@@ -96,7 +104,7 @@ api-gen/
 **所有后续的开发工作必须严格遵循本 README.md 中定义的规范和任务列表。**
 
 ### ✅ 任务执行规则
-1. **按阶段执行**：必须按照第一阶段→第二阶段→第三阶段→第四阶段→第五阶段的顺序进行
+1. **按阶段执行**：必须按照第一阶段→第二阶段→第三阶段→第四阶段→第五阶段→第六阶段的顺序进行
 2. **任务完成标记**：每完成一个任务，必须将对应的 `[ ]` 更新为 `[x]`
 3. **依赖关系**：下一阶段的任务开始前，必须确保上一阶段的所有任务已完成
 4. **文档同步**：任何代码变更都必须同步更新到 README.md 中

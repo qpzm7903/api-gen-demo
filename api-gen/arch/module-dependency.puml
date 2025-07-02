@@ -1,0 +1,72 @@
+@startuml 模块依赖关系图
+!theme aws-orange
+title OpenAPI Generator Demo - 模块依赖关系
+
+package "Maven 多模块项目" {
+    
+    package "Common 模块" as common {
+        [通用数据模型] as models
+        [通用响应结构] as response
+        [错误码定义] as error
+        [基础类型] as types
+    }
+    
+    package "User Service" as user {
+        [用户 API] as userApi
+        [用户模型] as userModel
+        [用户控制器] as userController
+    }
+    
+    package "Menu Service" as menu {
+        [菜单 API] as menuApi
+        [菜单模型] as menuModel
+        [菜单控制器] as menuController
+    }
+    
+    package "Permission Service" as permission {
+        [权限 API] as permApi
+        [权限模型] as permModel
+        [权限控制器] as permController
+    }
+}
+
+' 依赖关系
+user --> common : 依赖
+menu --> common : 依赖  
+permission --> common : 依赖
+
+' 组件内部关系
+userController --> userApi
+userApi --> userModel
+userModel --> models
+
+menuController --> menuApi
+menuApi --> menuModel
+menuModel --> models
+
+permController --> permApi
+permApi --> permModel
+permModel --> models
+
+note right of common
+  只生成 Model 类
+  被所有服务依赖
+  提供公共数据结构
+end note
+
+note bottom of user
+  用户生命周期管理
+  提供认证和用户信息API
+end note
+
+note bottom of menu
+  菜单导航管理
+  提供菜单树结构API
+end note
+
+note bottom of permission
+  权限和角色管理
+  提供授权验证API
+end note
+
+@enduml 
