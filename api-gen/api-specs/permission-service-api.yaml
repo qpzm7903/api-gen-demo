@@ -1,0 +1,1058 @@
+openapi: 3.0.3
+info:
+  title: Permission Service API
+  description: 权限服务API，提供权限管理、角色管理、用户角色分配等功能
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@qpzm7903.com
+
+servers:
+  - url: http://localhost:8083
+    description: Permission Service Development Server
+
+tags:
+  - name: permission-management
+    description: 权限管理相关接口
+  - name: role-management
+    description: 角色管理相关接口
+  - name: user-role
+    description: 用户角色分配相关接口
+
+paths:
+  /permissions:
+    get:
+      tags:
+        - permission-management
+      summary: 获取权限列表
+      description: 分页查询权限列表
+      operationId: getPermissionList
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码，从0开始
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          description: 每页大小
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: sort
+          in: query
+          description: 排序字段
+          required: false
+          schema:
+            type: string
+            default: "createTime"
+        - name: direction
+          in: query
+          description: 排序方向
+          required: false
+          schema:
+            $ref: 'common-types.yaml#/components/schemas/PageRequest/properties/sortDirection'
+        - name: name
+          in: query
+          description: 权限名称筛选
+          required: false
+          schema:
+            type: string
+        - name: code
+          in: query
+          description: 权限编码筛选
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 权限状态筛选
+          required: false
+          schema:
+            $ref: '#/components/schemas/PermissionStatus'
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: 'common-types.yaml#/components/schemas/PageData'
+                          - type: object
+                            properties:
+                              content:
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/PermissionInfo'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - permission-management
+      summary: 创建权限
+      description: 创建新权限
+      operationId: createPermission
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PermissionInfo'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '409':
+          description: 权限已存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+  /permissions/{permissionId}:
+    get:
+      tags:
+        - permission-management
+      summary: 获取权限详情
+      description: 根据权限ID获取权限详细信息
+      operationId: getPermissionById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: permissionId
+          in: path
+          description: 权限ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PermissionInfo'
+        '404':
+          description: 权限不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - permission-management
+      summary: 更新权限信息
+      description: 更新权限基本信息
+      operationId: updatePermission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: permissionId
+          in: path
+          description: 权限ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PermissionInfo'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: 权限不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - permission-management
+      summary: 删除权限
+      description: 软删除权限（逻辑删除）
+      operationId: deletePermission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: permissionId
+          in: path
+          description: 权限ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+        '400':
+          description: 权限正在被使用，无法删除
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: 权限不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+  /roles:
+    get:
+      tags:
+        - role-management
+      summary: 获取角色列表
+      description: 分页查询角色列表
+      operationId: getRoleList
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码，从0开始
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          description: 每页大小
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: sort
+          in: query
+          description: 排序字段
+          required: false
+          schema:
+            type: string
+            default: "createTime"
+        - name: direction
+          in: query
+          description: 排序方向
+          required: false
+          schema:
+            $ref: 'common-types.yaml#/components/schemas/PageRequest/properties/sortDirection'
+        - name: name
+          in: query
+          description: 角色名称筛选
+          required: false
+          schema:
+            type: string
+        - name: code
+          in: query
+          description: 角色编码筛选
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 角色状态筛选
+          required: false
+          schema:
+            $ref: '#/components/schemas/RoleStatus'
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: 'common-types.yaml#/components/schemas/PageData'
+                          - type: object
+                            properties:
+                              content:
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/RoleInfo'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - role-management
+      summary: 创建角色
+      description: 创建新角色
+      operationId: createRole
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RoleInfo'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '409':
+          description: 角色已存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+  /roles/{roleId}:
+    get:
+      tags:
+        - role-management
+      summary: 获取角色详情
+      description: 根据角色ID获取角色详细信息
+      operationId: getRoleById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: roleId
+          in: path
+          description: 角色ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RoleInfo'
+        '404':
+          description: 角色不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - role-management
+      summary: 更新角色信息
+      description: 更新角色基本信息
+      operationId: updateRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: roleId
+          in: path
+          description: 角色ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RoleInfo'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: 角色不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - role-management
+      summary: 删除角色
+      description: 软删除角色（逻辑删除）
+      operationId: deleteRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: roleId
+          in: path
+          description: 角色ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+        '400':
+          description: 角色正在被使用，无法删除
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: 角色不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+  /roles/{roleId}/permissions:
+    get:
+      tags:
+        - role-management
+      summary: 获取角色权限
+      description: 获取指定角色的所有权限
+      operationId: getRolePermissions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: roleId
+          in: path
+          description: 角色ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PermissionInfo'
+        '404':
+          description: 角色不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - role-management
+      summary: 为角色分配权限
+      description: 为指定角色分配权限
+      operationId: assignPermissionsToRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: roleId
+          in: path
+          description: 角色ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolePermissionRequest'
+      responses:
+        '200':
+          description: 分配成功
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: 角色或权限不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+  /users/{userId}/roles:
+    get:
+      tags:
+        - user-role
+      summary: 获取用户角色
+      description: 获取指定用户的所有角色
+      operationId: getUserRoles
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: 用户ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UserRoleInfo'
+        '404':
+          description: 用户不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - user-role
+      summary: 为用户分配角色
+      description: 为指定用户分配角色
+      operationId: assignRolesToUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: 用户ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRoleRequest'
+      responses:
+        '200':
+          description: 分配成功
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: 用户或角色不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+  /users/{userId}/roles/{roleId}:
+    delete:
+      tags:
+        - user-role
+      summary: 移除用户角色
+      description: 移除用户的指定角色
+      operationId: removeUserRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: 用户ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: roleId
+          in: path
+          description: 角色ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 移除成功
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: 用户、角色或关联关系不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    PermissionStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - DELETED
+      description: |
+        权限状态枚举:
+        * `ACTIVE` - 启用状态
+        * `INACTIVE` - 禁用状态
+        * `DELETED` - 已删除状态
+
+    RoleStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - DELETED
+      description: |
+        角色状态枚举:
+        * `ACTIVE` - 启用状态
+        * `INACTIVE` - 禁用状态
+        * `DELETED` - 已删除状态
+
+    PermissionInfo:
+      type: object
+      required:
+        - id
+        - name
+        - code
+        - status
+        - createTime
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 权限ID
+          example: 2001
+        name:
+          type: string
+          description: 权限名称
+          example: "查看用户"
+          minLength: 1
+          maxLength: 100
+        code:
+          type: string
+          description: 权限编码，唯一标识
+          example: "user:read"
+          pattern: '^[a-zA-Z0-9:_]+$'
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          description: 权限描述
+          example: "查看用户列表和用户详情的权限"
+          maxLength: 500
+        resource:
+          type: string
+          description: 资源标识
+          example: "user"
+          maxLength: 100
+        action:
+          type: string
+          description: 操作标识
+          example: "read"
+          maxLength: 50
+        status:
+          $ref: '#/components/schemas/PermissionStatus'
+        createTime:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2023-11-01T09:00:00Z"
+        updateTime:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2023-12-01T10:30:00Z"
+
+    RoleInfo:
+      type: object
+      required:
+        - id
+        - name
+        - code
+        - status
+        - createTime
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 角色ID
+          example: 3001
+        name:
+          type: string
+          description: 角色名称
+          example: "系统管理员"
+          minLength: 1
+          maxLength: 100
+        code:
+          type: string
+          description: 角色编码，唯一标识
+          example: "ADMIN"
+          pattern: '^[A-Z0-9_]+$'
+          minLength: 1
+          maxLength: 50
+        description:
+          type: string
+          description: 角色描述
+          example: "系统管理员角色，拥有所有权限"
+          maxLength: 500
+        status:
+          $ref: '#/components/schemas/RoleStatus'
+        createTime:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2023-11-01T09:00:00Z"
+        updateTime:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2023-12-01T10:30:00Z"
+
+    UserRoleInfo:
+      type: object
+      required:
+        - roleId
+        - roleName
+        - roleCode
+        - assignTime
+      properties:
+        roleId:
+          type: integer
+          format: int64
+          description: 角色ID
+          example: 3001
+        roleName:
+          type: string
+          description: 角色名称
+          example: "系统管理员"
+        roleCode:
+          type: string
+          description: 角色编码
+          example: "ADMIN"
+        roleDescription:
+          type: string
+          description: 角色描述
+          example: "系统管理员角色，拥有所有权限"
+        assignTime:
+          type: string
+          format: date-time
+          description: 分配时间
+          example: "2023-11-01T09:00:00Z"
+
+    PermissionCreateRequest:
+      type: object
+      required:
+        - name
+        - code
+      properties:
+        name:
+          type: string
+          description: 权限名称
+          example: "查看用户"
+          minLength: 1
+          maxLength: 100
+        code:
+          type: string
+          description: 权限编码，全局唯一
+          example: "user:read"
+          pattern: '^[a-zA-Z0-9:_]+$'
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          description: 权限描述
+          example: "查看用户列表和用户详情的权限"
+          maxLength: 500
+        resource:
+          type: string
+          description: 资源标识
+          example: "user"
+          maxLength: 100
+        action:
+          type: string
+          description: 操作标识
+          example: "read"
+          maxLength: 50
+        status:
+          $ref: '#/components/schemas/PermissionStatus'
+          default: ACTIVE
+
+    PermissionUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 权限名称
+          example: "查看用户"
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          description: 权限描述
+          example: "查看用户列表和用户详情的权限"
+          maxLength: 500
+        resource:
+          type: string
+          description: 资源标识
+          example: "user"
+          maxLength: 100
+        action:
+          type: string
+          description: 操作标识
+          example: "read"
+          maxLength: 50
+        status:
+          $ref: '#/components/schemas/PermissionStatus'
+
+    RoleCreateRequest:
+      type: object
+      required:
+        - name
+        - code
+      properties:
+        name:
+          type: string
+          description: 角色名称
+          example: "系统管理员"
+          minLength: 1
+          maxLength: 100
+        code:
+          type: string
+          description: 角色编码，全局唯一
+          example: "ADMIN"
+          pattern: '^[A-Z0-9_]+$'
+          minLength: 1
+          maxLength: 50
+        description:
+          type: string
+          description: 角色描述
+          example: "系统管理员角色，拥有所有权限"
+          maxLength: 500
+        status:
+          $ref: '#/components/schemas/RoleStatus'
+          default: ACTIVE
+
+    RoleUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 角色名称
+          example: "系统管理员"
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          description: 角色描述
+          example: "系统管理员角色，拥有所有权限"
+          maxLength: 500
+        status:
+          $ref: '#/components/schemas/RoleStatus'
+
+    RolePermissionRequest:
+      type: object
+      required:
+        - permissionIds
+      properties:
+        permissionIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+          description: 权限ID列表
+          example: [2001, 2002, 2003]
+          minItems: 1
+
+    UserRoleRequest:
+      type: object
+      required:
+        - roleIds
+      properties:
+        roleIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+          description: 角色ID列表
+          example: [3001, 3002]
+          minItems: 1

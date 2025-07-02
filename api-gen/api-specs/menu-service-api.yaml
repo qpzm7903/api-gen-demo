@@ -1,0 +1,569 @@
+openapi: 3.0.3
+info:
+  title: Menu Service API
+  description: 菜单服务API，提供菜单管理、菜单树形结构、菜单权限关联等功能
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@qpzm7903.com
+
+servers:
+  - url: http://localhost:8082
+    description: Menu Service Development Server
+
+tags:
+  - name: menu-management
+    description: 菜单管理相关接口
+  - name: menu-tree
+    description: 菜单树形结构相关接口
+
+paths:
+  /menus:
+    get:
+      tags:
+        - menu-management
+      summary: 获取菜单列表
+      description: 分页查询菜单列表
+      operationId: getMenuList
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码，从0开始
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          description: 每页大小
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: sort
+          in: query
+          description: 排序字段
+          required: false
+          schema:
+            type: string
+            default: "sortOrder"
+        - name: direction
+          in: query
+          description: 排序方向
+          required: false
+          schema:
+            $ref: 'common-types.yaml#/components/schemas/PageRequest/properties/sortDirection'
+        - name: name
+          in: query
+          description: 菜单名称筛选
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 菜单状态筛选
+          required: false
+          schema:
+            $ref: '#/components/schemas/MenuStatus'
+        - name: parentId
+          in: query
+          description: 父菜单ID筛选
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: 'common-types.yaml#/components/schemas/PageData'
+                          - type: object
+                            properties:
+                              content:
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/MenuInfo'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - menu-management
+      summary: 创建菜单
+      description: 创建新菜单
+      operationId: createMenu
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MenuInfo'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '409':
+          description: 菜单已存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+  /menus/{menuId}:
+    get:
+      tags:
+        - menu-management
+      summary: 获取菜单详情
+      description: 根据菜单ID获取菜单详细信息
+      operationId: getMenuById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: menuId
+          in: path
+          description: 菜单ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MenuInfo'
+        '404':
+          description: 菜单不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - menu-management
+      summary: 更新菜单信息
+      description: 更新菜单基本信息
+      operationId: updateMenu
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: menuId
+          in: path
+          description: 菜单ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MenuInfo'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: 菜单不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - menu-management
+      summary: 删除菜单
+      description: 软删除菜单（逻辑删除）
+      operationId: deleteMenu
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: menuId
+          in: path
+          description: 菜单ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+        '400':
+          description: 不能删除有子菜单的菜单
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: 菜单不存在
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+  /menus/tree:
+    get:
+      tags:
+        - menu-tree
+      summary: 获取菜单树
+      description: 获取完整的菜单树形结构
+      operationId: getMenuTree
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: includeDisabled
+          in: query
+          description: 是否包含禁用的菜单
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: maxDepth
+          in: query
+          description: 最大深度，不传表示获取全部
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'common-types.yaml#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MenuTreeNode'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: 'common-types.yaml#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    MenuStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - DELETED
+      description: |
+        菜单状态枚举:
+        * `ACTIVE` - 启用状态
+        * `INACTIVE` - 禁用状态
+        * `DELETED` - 已删除状态
+
+    MenuType:
+      type: string
+      enum:
+        - FOLDER
+        - MENU
+        - BUTTON
+      description: |
+        菜单类型枚举:
+        * `FOLDER` - 文件夹（目录）
+        * `MENU` - 菜单页面
+        * `BUTTON` - 按钮/操作
+
+    MenuInfo:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - status
+        - sortOrder
+        - createTime
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 菜单ID
+          example: 1001
+        parentId:
+          type: integer
+          format: int64
+          description: 父菜单ID，顶级菜单为null
+          example: 1000
+        name:
+          type: string
+          description: 菜单名称
+          example: "用户管理"
+          minLength: 1
+          maxLength: 100
+        code:
+          type: string
+          description: 菜单编码，唯一标识
+          example: "user_management"
+          pattern: '^[a-zA-Z0-9_]+$'
+          minLength: 1
+          maxLength: 50
+        type:
+          $ref: '#/components/schemas/MenuType'
+        icon:
+          type: string
+          description: 菜单图标
+          example: "user"
+          maxLength: 100
+        path:
+          type: string
+          description: 菜单路径/URL
+          example: "/admin/users"
+          maxLength: 200
+        component:
+          type: string
+          description: 前端组件路径
+          example: "views/user/UserList.vue"
+          maxLength: 200
+        sortOrder:
+          type: integer
+          description: 排序顺序，数字越小越靠前
+          example: 10
+          minimum: 0
+        level:
+          type: integer
+          description: 菜单层级，从1开始
+          example: 2
+          minimum: 1
+        visible:
+          type: boolean
+          description: 是否可见
+          default: true
+        keepAlive:
+          type: boolean
+          description: 是否缓存页面
+          default: false
+        external:
+          type: boolean
+          description: 是否外部链接
+          default: false
+        status:
+          $ref: '#/components/schemas/MenuStatus'
+        description:
+          type: string
+          description: 菜单描述
+          example: "管理系统用户信息"
+          maxLength: 500
+        createTime:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2023-11-01T09:00:00Z"
+        updateTime:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2023-12-01T10:30:00Z"
+
+    MenuTreeNode:
+      allOf:
+        - $ref: '#/components/schemas/MenuInfo'
+        - type: object
+          properties:
+            children:
+              type: array
+              items:
+                $ref: '#/components/schemas/MenuTreeNode'
+              description: 子菜单列表
+
+    MenuCreateRequest:
+      type: object
+      required:
+        - name
+        - code
+        - type
+      properties:
+        parentId:
+          type: integer
+          format: int64
+          description: 父菜单ID，顶级菜单不传此字段
+          example: 1000
+        name:
+          type: string
+          description: 菜单名称
+          example: "用户管理"
+          minLength: 1
+          maxLength: 100
+        code:
+          type: string
+          description: 菜单编码，全局唯一
+          example: "user_management"
+          pattern: '^[a-zA-Z0-9_]+$'
+          minLength: 1
+          maxLength: 50
+        type:
+          $ref: '#/components/schemas/MenuType'
+        icon:
+          type: string
+          description: 菜单图标
+          example: "user"
+          maxLength: 100
+        path:
+          type: string
+          description: 菜单路径/URL
+          example: "/admin/users"
+          maxLength: 200
+        component:
+          type: string
+          description: 前端组件路径
+          example: "views/user/UserList.vue"
+          maxLength: 200
+        sortOrder:
+          type: integer
+          description: 排序顺序，数字越小越靠前
+          example: 10
+          minimum: 0
+          default: 0
+        visible:
+          type: boolean
+          description: 是否可见
+          default: true
+        keepAlive:
+          type: boolean
+          description: 是否缓存页面
+          default: false
+        external:
+          type: boolean
+          description: 是否外部链接
+          default: false
+        status:
+          $ref: '#/components/schemas/MenuStatus'
+          default: ACTIVE
+        description:
+          type: string
+          description: 菜单描述
+          example: "管理系统用户信息"
+          maxLength: 500
+
+    MenuUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 菜单名称
+          example: "用户管理"
+          minLength: 1
+          maxLength: 100
+        icon:
+          type: string
+          description: 菜单图标
+          example: "user"
+          maxLength: 100
+        path:
+          type: string
+          description: 菜单路径/URL
+          example: "/admin/users"
+          maxLength: 200
+        component:
+          type: string
+          description: 前端组件路径
+          example: "views/user/UserList.vue"
+          maxLength: 200
+        visible:
+          type: boolean
+          description: 是否可见
+        keepAlive:
+          type: boolean
+          description: 是否缓存页面
+        external:
+          type: boolean
+          description: 是否外部链接
+        status:
+          $ref: '#/components/schemas/MenuStatus'
+        description:
+          type: string
+          description: 菜单描述
+          example: "管理系统用户信息"
+          maxLength: 500
