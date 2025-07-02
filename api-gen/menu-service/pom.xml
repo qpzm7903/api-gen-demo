@@ -81,8 +81,8 @@
                                     <inputSpec>${project.parent.basedir}/api-specs/menu-service-api.yaml</inputSpec>
                                     <!-- 生成器类型：Spring Boot -->
                                     <generatorName>spring</generatorName>
-                                    <!-- 输出目录 -->
-                                    <output>${project.build.directory}/generated-sources/openapi</output>
+                                    <!-- 输出目录 - 标准的Maven构建目录 -->
+                                    <o>${project.build.directory}/generated-sources/openapi</o>
                                     <!-- 包名配置 -->
                                     <apiPackage>com.qpzm7903.menu.api</apiPackage>
                                     <modelPackage>com.qpzm7903.menu.model</modelPackage>

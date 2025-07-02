@@ -18,9 +18,10 @@ buildNumber.properties
 # OpenAPI Generator 相关
 # ===========================================
 
-# OpenAPI Generator 生成的文件（如果你想版本控制生成的代码，注释掉下面的行）
-**/target/generated-sources/
-**/target/generated-test-sources/
+# OpenAPI Generator 生成的文件
+# 注意：我们选择将生成的API代码加入版本控制以便代码审查和IDE支持
+# **/target/generated-sources/  # 取消注释此行可忽略生成的代码
+# **/target/generated-test-sources/
 .openapi-generator/
 .openapi-generator-ignore
 

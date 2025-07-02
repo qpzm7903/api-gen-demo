@@ -100,15 +100,15 @@
                                 <configuration>
                                     <!-- API 规范文件路径 -->
                                     <inputSpec>${project.basedir}/../api-specs/common-types.yaml</inputSpec>
-                                                                <!-- 生成器类型：Spring Boot 模型 -->
-                            <generatorName>spring</generatorName>
-                                    <!-- 输出目录 -->
-                                    <output>${project.build.directory}/generated-sources/openapi</output>
+                                    <!-- 生成器类型：Spring Boot 模型 -->
+                                    <generatorName>spring</generatorName>
+                                    <!-- 输出目录 - 标准的Maven构建目录 -->
+                                    <o>${project.build.directory}/generated-sources/openapi</o>
                                     <!-- 只生成模型，不生成 API -->
                                     <modelPackage>com.qpzm7903.common.model</modelPackage>
                                     <generateApis>false</generateApis>
                                     <generateModels>true</generateModels>
-                                    <generateSupportingFiles>true</generateSupportingFiles>
+                                    <generateSupportingFiles>false</generateSupportingFiles>
                                     <generateModelTests>false</generateModelTests>
                                     <generateApiTests>false</generateApiTests>
                                     <generateModelDocumentation>false</generateModelDocumentation>
