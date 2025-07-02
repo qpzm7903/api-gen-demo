@@ -1,0 +1,207 @@
+# ===========================================
+# OpenAPI Generator Maven 多模块项目 .gitignore
+# ===========================================
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ===========================================
+# OpenAPI Generator 相关
+# ===========================================
+
+# OpenAPI Generator 生成的文件（如果你想版本控制生成的代码，注释掉下面的行）
+**/target/generated-sources/
+**/target/generated-test-sources/
+.openapi-generator/
+.openapi-generator-ignore
+
+# ===========================================
+# Java
+# ===========================================
+
+# 编译的类文件
+*.class
+
+# 日志文件
+*.log
+
+# BlueJ 文件
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# 包文件
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# 虚拟机崩溃日志
+hs_err_pid*
+
+# ===========================================
+# IDE 文件
+# ===========================================
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+
+# VS Code
+.vscode/
+
+# ===========================================
+# Spring Boot
+# ===========================================
+
+# Spring Boot 应用程序属性（敏感信息）
+application-local.properties
+application-dev.properties
+application-prod.properties
+
+# Spring Boot 临时文件
+spring-boot-*.log
+
+# ===========================================
+# 操作系统
+# ===========================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.tmp
+*.temp
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===========================================
+# 其他工具和临时文件
+# ===========================================
+
+# Git
+*.orig
+
+# Backup files
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+
+# 临时文件
+*.tmp
+*.temp
+
+# 压缩文件
+*.7z
+*.dmg
+*.gz
+*.iso
+*.tar
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 配置文件（可能包含敏感信息）
+config/local/
+secrets/
+.env
+.env.local
+.env.*.local
+
+# 缓存目录
+.cache/
+.npm
+.yarn-integrity
+
+# 测试覆盖率报告
+coverage/
+*.lcov
+
+# ===========================================
+# 项目特定
+# ===========================================
+
+# 如果有本地开发用的文档或脚本
+/docs/local/
+/scripts/local/
+
+# 本地测试数据
+/test-data/
+/local-data/
+
+# API 测试文件（可能包含敏感信息）
+*.http.local
+*.rest.local
+
+# 性能测试结果
+/performance-results/ 
